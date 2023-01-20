@@ -1,3 +1,4 @@
+const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const rateLimit = require("express-rate-limit");
@@ -11,10 +12,17 @@ const globalErrorhandler = require("./controllers/errorController");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
 const reviewRouter = require("./routes/reviewRoutes");
+const viewRouter = require("./routes/viewRoutes");
 
 const app = express();
 
+app.set("view engine", "pug");
+
+app.set("views", path.join(__dirname, "views"));
 //1) GLOBAL middleware
+// serving static file
+app.use(express.static(path.join(__dirname, "public")));
+// app.use(express.static(`${__dirname}/public`));
 // console.log(process.env.NODE_ENV);
 
 // set security HTTP headers
@@ -56,9 +64,6 @@ app.use(
   })
 ); // ?sort=duration&sort=price -> price
 
-// serving static file
-app.use(express.static(`${__dirname}/public`));
-
 //order matter in stack
 // app.use((req, res, next) => {
 //   console.log('Hello from the middleware 👋');
@@ -81,6 +86,7 @@ app.use((req, res, next) => {
 
 //3rd All Routes
 
+app.use("/", viewRouter);
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/reviews", reviewRouter);
